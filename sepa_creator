@@ -1,15 +1,16 @@
 #!/bin/env python
 
-import json
 import utils
 import xml_convert
 
 import pandas as pd
 import datetime
 from argparse import ArgumentParser
+import json
 import functools
 import warnings
 warnings.filterwarnings('ignore')
+
 
 parser = ArgumentParser(prog="SEPA Creator", description="Erstellt eine csv-Datei fuer SEPA-Sammeleinzuege aus Daten aus dem NaMi.\
 Gib in die Nami-Suche 'Beitragsart und Kontoverbindung' ein und uebergib das File unter der Option '-p'. In der Nami-Suche unter 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung' wird ein File gedownloadet, das man unter der Option '-t' angeben muss. \
@@ -83,7 +84,10 @@ def project_specific_parsing(project_file_path, base_data):
     with open(project_file_path, "r") as project_file:
         project_information = json.load(project_file)
     fee_info = pd.DataFrame.from_dict(project_information["Beitragsinformationen"], orient="index", columns=["Beitrag"])
-    project_data = base_data.loc[base_data["Mandat"].astype(str).isin(fee_info.index)][["Mandat", "Vorname", "Nachname", "BeitragArt", "Leader/CEO"]]
+    if len(fee_info) > 0:
+        project_data = base_data.loc[base_data["Mandat"].astype(str).isin(fee_info.index)][["Mandat", "Vorname", "Nachname", "BeitragArt", "Leader/CEO"]]
+    else:
+        project_data = base_data[["Mandat", "Vorname", "Nachname", "BeitragArt", "Leader/CEO"]]
     # Insert Verwendungszweck.
     project_data["Verwendungszweck"] = project_data.apply(functools.partial(utils.parse_verwendungszweck, description=project_information["Verwendungszweck"]), axis=1)
 
