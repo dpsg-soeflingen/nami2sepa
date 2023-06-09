@@ -1,0 +1,3 @@
+pandas
+openpyxl
+git+https://github.com/raphaelm/python-sepaxml.git

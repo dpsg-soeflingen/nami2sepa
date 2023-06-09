@@ -1,0 +1,95 @@
+#!/bin/env python
+
+import utils
+import xml_convert
+
+import pandas as pd
+import datetime
+from argparse import ArgumentParser
+import functools
+import warnings
+warnings.filterwarnings('ignore')
+
+parser = ArgumentParser(prog="SEPA Creator", description="Erstellt eine csv-Datei fuer SEPA-Sammeleinzuege aus Daten aus dem NaMi.\
+Gib in die Nami-Suche 'Beitragsart und Kontoverbindung' ein und uebergib das File unter der Option '-p'. In der Nami-Suche unter 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung' wird ein File gedownloadet, das man unter der Option '-t' angeben muss. \
+Des Weiteren gibt es das File Sepa_Informations.xlsx, das Mandatsdatum, Ersteinzugsdatum, manuellen Beitrag etc. angibt.")
+parser.add_argument("year", type=int, help="Das Jahr, fuer das eingezogen werden soll.")
+parser.add_argument("half", type=int, help="Gibt das Halbjahr an, entweder 1 oder 2.")
+parser.add_argument("-a", "--accounts_file", help="Pfad zur Excel-Datei, in der NaMi-Suche: 'Beitragsart und Kontoverbindung.'", required=True)
+parser.add_argument("-t", "--tasks_file", help="Pfad zur Excel-Datei, in der NaMi-Suche: 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung'.", required=True)
+parser.add_argument("-i", "--sepa_infos", default="Sepa_Informations.xlsx", help="Pfad zur Excel-Datei, um SEPA-Infos zu erhalten, die nicht im NaMi gespeichert sind.")
+parser.add_argument("-p", "--project_file", help="Pfad zur Excel-Datei, die Mitgliedsnummer und Betrag fuer Aktion angibt.")
+parser.add_argument("-o", "--output", default="output.xml", help="Pfad zur Output-Datei, die der Sparkasse fuer den Sammel-Einzug gegeben werden kann.")
+args = parser.parse_args()
+
+group = pd.read_excel(args.payment_file)
+group.index = group["Mitgliedsnummer"]
+group = group.loc[group["Status"] == "Aktiv"]
+
+tasks = pd.read_excel(args.tasks_file)
+
+sepa_information = pd.read_excel(args.sepa_infos)
+
+
+"""
+Definition Leiter:
+- Is an active member (did not resign).
+- Has a current task (not yet finished) as a Leiter (Taetigkeit == "€ LeiterIn")
+- OR: Is Stammesvorstand (Stufe_Abteilung == "Vorstand")
+"""
+leader_ids = tasks.loc[(tasks["Status"] == "AKTIV")\
+        & (tasks["Aktiv_Bis"] == "-null-")\
+        & ((tasks["Taetigkeit"] == "€ LeiterIn") | (tasks["Stufe_Abteilung"] == "Vorstand"))\
+    ].groupby("Mitgliedsnummer").head(1)["Mitgliedsnummer"]
+
+group.loc[leader_ids, "Leader/CEO"] = True
+group["Leader/CEO"] = group["Leader/CEO"].fillna(False)
+
+
+# Gather information.
+sepa = group[["Vorname", "Nachname", "Mitgliedsnummer", "IBAN", "BIC", "BeitragArt", "Kontoinhaber", "Leader/CEO"]]
+# Get payer name.
+sepa[["Zahler_Vorname", "Zahler_Name"]] = sepa["Kontoinhaber"].str.rsplit(" ", n=1, expand=True)
+# Get payment-identification.
+sepa["Identifikation"] = f"Beitrag0{args.half}{args.year}"
+
+# Add SEPA-Information not saved within NaMi.
+sepa_dates = pd.DataFrame()
+sepa_dates["Mandat"] = sepa_information["Mitgliedsnummer"]
+sepa_dates["Mandatsdatum"] = sepa_information["Datum"].map(lambda e: e.date())
+# If this is the first Einzug, fill-in today's date.
+sepa_dates["Erstlastschrift"] = sepa_information["Erstlastschrift"].fillna(datetime.datetime.now())
+sepa_dates["Letztlastschrift"] = ""
+sepa_dates["OverrideBeitrag"] = sepa_information["OverrideBeitrag"]
+
+sepa = sepa.join(sepa_dates.set_index("Mandat"), on="Mandat")
+
+if args.project_file:
+    project_information = pd.read_excel(args.project_file)
+    sepa = sepa.join(project_information.set_index("Mandat"), on="Mandat", rsuffix="_project")
+
+# Insert Verwendungszweck.
+sepa["Verwendungszweck"] = sepa.apply(functools.partial(utils.gen_usage, half=args.half, year=args.year), axis=1)
+# Clean dataframe.
+sepa = sepa \
+    .drop(["BeitragArt", "Leader/CEO", "Vorname", "Nachname", "Kontoinhaber"], axis=1) \
+    .rename({"Mitgliedsnummer": "Mandat", "Zahler_Vorname": "Vorname", "Zahler_Name": "Name"}, axis=1) \
+    .reset_index() \
+    .drop("Mitgliedsnummer", axis=1)
+sepa.index.name = "Nummer"
+sepa.index += 1
+
+if args.project_file:
+    sepa["Beitrag"] = sepa["Beitrag_project"]
+else:
+    # Override fees for Alumnis or still-active members who are not active as a Leiter
+    sepa["Beitrag"] = sepa["OverrideBeitrag"].fillna(sepa["Beitrag"])
+
+# Remove members within Sozialtopf.
+sepa = sepa[sepa["Beitrag"] > 0]
+
+# Sort columns.
+sepa  = sepa[["Name", "Vorname", "Identifikation", "BIC", "IBAN", "Mandat", "Mandatsdatum", "Erstlastschrift", "Letztlastschrift", "Beitrag", "Verwendungszweck"]]
+
+with open("output.xml", "w") as out_file:
+    out_file.write(xml_convert.generate_xml(sepa))

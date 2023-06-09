@@ -1,0 +1,9 @@
+.venv
+*.xlsx
+*.xml
+*.json
+*.ipynb
+.ipynb_checkpoints
+.judo
+__pycache__
+data
