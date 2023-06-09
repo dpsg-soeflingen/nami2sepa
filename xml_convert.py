@@ -22,7 +22,7 @@ def generate_xml(orders):
             "name": f"{order.Name}, {order.Vorname}",
             "IBAN": order.IBAN,
             "BIC": order.BIC,
-            "amount": int(order.Beitrag*100),
+            "amount": int(float(order.Beitrag)*100),
             "type": "FRST" if utils.is_today(order.Erstlastschrift) else "RCUR",
             "collection_date": datetime.date.today(),
             "mandate_id": str(order.Mandat),
@@ -33,8 +33,3 @@ def generate_xml(orders):
 
         sepa.add_payment(payment)
     return sepa.export().decode("utf-8")
-
-if __name__ == "__main__":
-    data = pd.read_excel("output.xlsx")
-    with open("output.xml", "w") as f:
-        f.write(generate_xml(data))
