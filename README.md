@@ -31,19 +31,8 @@ sepa_creator <Jahr> <Halbjahr> -a <Pfad zur Kontoverbindungs-Datei> -t <Pfad zur
 Alle weiteren Kommandozeilen-Argumente koennen in der Hilfe nachlegesen werden: ``sepa_creator -h``.
 
 Todos:
-- 2 Files generated from NaMi
-- One File for Sepa Mandate, override fees, ...
-- One Project-File. Should include actual fees if not normal annual and participants (Mitgliedernummern).
-
-Create project: 
-- Get up-to-date files from NaMi.
-- Use SEPA-info file (static in this case)
-- Provide project file.
-- Run script
-
-Problem:
-- I want to automate the "Getting files from NaMi"-part ...
-
-But first, implement the project file!
-
-Should be Aktions file.
+- If members listed in project_config.json, only use those.
+- Beitragsberechnungen: 
+    - Standard-Berechnung
+    - Standard-Override
+    - Projekt-Override

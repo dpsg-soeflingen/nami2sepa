@@ -124,5 +124,5 @@ if __name__ == "__main__":
     # sort columns
     sepa  = data[["Name", "Vorname", "Identifikation", "BIC", "IBAN", "Mandat", "Mandatsdatum", "Erstlastschrift", "Letztlastschrift", "Beitrag", "Verwendungszweck"]]
     print(data.columns)
-    output_xml(sepa, args.output)
+    # output_xml(sepa, args.output)
 

@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def generate_xml(orders):
-    with open("./config.json", "r") as file:
+    with open("./sepa_config.json", "r") as file:
         config = json.load(file)
 
     sepa = SepaDD(config, schema="pain.008.001.02", clean=True)
