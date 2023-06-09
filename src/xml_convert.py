@@ -3,7 +3,7 @@
 import utils
 
 from sepaxml import SepaDD
-import datetime, uuid
+import datetime
 import json
 import pandas as pd
 
