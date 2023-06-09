@@ -1,4 +1,4 @@
-from . import parsing
+import parsing
 
 import pandas as pd
 import json

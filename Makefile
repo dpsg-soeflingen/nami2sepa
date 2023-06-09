@@ -1,12 +1,12 @@
 install:
-	cp -r src ~/.local/share/nami2dpsg
-	python -m venv ~/.local/share/nami2dpsg/.venv
-	~/.local/share/nami2dpsg/.venv/bin/pip install -r requirements.txt
-	cp -r nami2dpsg ~/.local/bin/
+	cp -r src ~/.local/share/nami2sepa
+	python -m venv ~/.local/share/nami2sepa/.venv
+	~/.local/share/nami2sepa/.venv/bin/pip install -r requirements.txt
+	cp nami2sepa ~/.local/bin/
 
 uninstall:
-	rm -r ~/.local/share/nami2dpsg
-	rm ~/.local/bin/nami2dpsg
+	rm -r ~/.local/share/nami2sepa
+	rm ~/.local/bin/nami2sepa
 
 install_dev:
 	python -m venv .venv

@@ -1,6 +1,6 @@
 #!/bin/env python
 
-from . import logic, parsing, utils, xml_convert
+import logic, parsing, utils, xml_convert
 
 from argparse import ArgumentParser
 import warnings

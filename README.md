@@ -1,7 +1,7 @@
 # NaMi2SEPA
 
-NaMi2SEPA ist ein Tool mit dem man einfach SEPA-Lastschriften aus NaMi-Exports generieren lassen kann.
-Hauptkomponenten sind durch eine Konfigurations-Datei einstellbar.
+NaMi2SEPA ermoeglicht einfaches Generieren von SEPA-Lastschriften aus NaMi-Exports.
+Wichtige Informationen sind in Konfigurations-Dateien ausgelagert, die einfach angepasst werden koennen.
 
 ## Installation
 Fuehre den folgenden Befehl aus, um das Tool zu installieren:
@@ -29,3 +29,7 @@ Starte nun das Tool mit den folgenden Parametern:
 sepa_creator -a <Pfad zur Kontoverbindungs-Datei> -t <Pfad zur Taetigkeiten-Datei> -i <Pfad zur SEPA-Informations Datei (nicht aus NaMi)> -p <Pfad zur Aktions-Datei>
 ````
 Alle weiteren Kommandozeilen-Argumente koennen in der Hilfe nachlegesen werden: ``sepa_creator -h``.
+
+## Die Aktions-Datei
+
+Diese Datei 
