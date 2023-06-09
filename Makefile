@@ -7,3 +7,7 @@ install:
 uninstall:
 	rm -r ~/.local/share/nami2dpsg
 	rm ~/.local/bin/nami2dpsg
+
+install_dev:
+	python -m venv .venv
+	.venv/bin/pip install -r requirements.txt
