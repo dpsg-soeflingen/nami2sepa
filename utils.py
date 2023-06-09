@@ -20,14 +20,10 @@ def calc_beitrag(row):
         return 10
     
 
-def gen_usage(row, half, year):
-    """
-    Generate Verwendungszweck.
-    """
-    firstname = row["Vorname"]
-    lastname = row["Nachname"]
-    return f"DPSG Ulm-Soeflingen Mitgliederbeitrag {half}. Halbjahr {year} fuer {lastname} {firstname}"
-
+def parse_verwendungszweck(row, description):
+    return description\
+        .replace("{Vorname}", row["Vorname"])\
+        .replace("{Nachname}", row["Nachname"])
 
 def is_today(date: datetime.datetime):
     return date.date() == datetime.date.today()
