@@ -1,0 +1,8 @@
+{
+    "name": "Euer DPSG Stammes-Name",
+    "IBAN": "Eure IBAN DE...",
+    "BIC": "...",
+    "batch": true,
+    "creditor_id": "Eure Glaeubiger-Identifikationsnummer DE...",
+    "currency": "EUR"
+}
