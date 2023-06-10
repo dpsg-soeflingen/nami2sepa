@@ -26,7 +26,6 @@ def parse_account_information(accounts_file_path, leader_ids):
     # Get payer name.
     sepa[["Zahler_Vorname", "Zahler_Name"]] = sepa["Kontoinhaber"].str.rsplit(" ", n=1, expand=True)
     # Get payment-identification.
-    sepa["Identifikation"] = "" # TODO
     sepa = sepa.rename({"Mitgliedsnummer": "Mandat"}, axis=1)
     return sepa
 
@@ -55,9 +54,10 @@ def parse_project_information(project_file_path, base_data):
         project_data = base_data[["Mandat", "Vorname", "Nachname", "BeitragArt", "Leader/CEO"]]
     # Insert Verwendungszweck.
     project_data["Verwendungszweck"] = project_data.apply(functools.partial(parsing.parse_verwendungszweck, description=project_information["Verwendungszweck"]), axis=1)
+    project_data["Identifikation"] = project_information["end2end-id"]
 
     # Calculate Beitrag
     fee_info.index = fee_info.index.astype(int)
     project_data["AktionBeitrag"] = fee_info["Beitrag"]
 
-    return project_data[["Mandat", "AktionBeitrag", "Verwendungszweck"]]
+    return project_data[["Mandat", "AktionBeitrag", "Verwendungszweck", "Identifikation"]]
