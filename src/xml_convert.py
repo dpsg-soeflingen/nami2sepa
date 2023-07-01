@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def generate_xml(orders):
-    with open("./sepa_config.json", "r") as file:
+    with open("./own_sepa_config.json", "r") as file:
         config = json.load(file)
 
     sepa = SepaDD(config, schema="pain.008.001.02", clean=True)
@@ -22,7 +22,7 @@ def generate_xml(orders):
             "name": f"{order.Name}, {order.Vorname}",
             "IBAN": order.IBAN,
             "BIC": order.BIC,
-            "amount": int(float(order.Beitrag)*100),
+            "amount": int(round(float(order.Beitrag)*100)),
             "type": "FRST" if utils.is_today(order.Erstlastschrift) else "RCUR",
             "collection_date": datetime.date.today(),
             "mandate_id": str(order.Mandat),
