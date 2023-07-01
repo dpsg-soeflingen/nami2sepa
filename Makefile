@@ -1,4 +1,5 @@
 install:
+	mkdir .config/nami2sepa
 	cp -r src ~/.local/share/nami2sepa
 	python -m venv ~/.local/share/nami2sepa/.venv
 	~/.local/share/nami2sepa/.venv/bin/pip install -r requirements.txt
