@@ -2,6 +2,7 @@
 
 import logic, parsing, utils, xml_convert
 
+import logging
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -27,11 +28,14 @@ def run(accounts_file, tasks_file, project_file, output, scan_dir):
     data = data.loc[data["Mandat"].isin(project_data.index)]
     data = logic.calc_beitrag(data)
 
-    # TODO Activate/Deactivate in config!
     # TODO Incorrect! Can be overwritten by manual setting in e.g. Aktionen!
     # Should be called "ignore-members"
     # Remove members within Sozialtopf.
-    # sepa = sepa[sepa["Beitrag"] > 0]
+    ignored_members = data[data["Beitrag"] > 0]
+    if len(ignored_members) > 0:
+        for _, ignored_member in ignored_members.iterrows():
+            logging.warning(f"Ignoriere {data.Verwendungszweck}.")
+    data = data[data["Beitrag"] > 0]
 
     # Sort columns.
     data = data \
