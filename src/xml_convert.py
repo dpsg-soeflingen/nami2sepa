@@ -6,10 +6,11 @@ from sepaxml import SepaDD
 import datetime
 import json
 import pandas as pd
+import os
 
 
 def generate_xml(orders):
-    with open("./own_sepa_config.json", "r") as file:
+    with open(os.path.expanduser("~/.config/nami2sepa/sepa_config.json"), "r") as file:
         config = json.load(file)
 
     sepa = SepaDD(config, schema="pain.008.001.02", clean=True)
