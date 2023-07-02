@@ -6,8 +6,18 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def run(accounts_file, tasks_file, project_file, output):
+def run(accounts_file, tasks_file, project_file, output, scan_dir):
     sepa_infos = "~/.config/nami2sepa/Sepa_Informations.xlsx"
+    if any([elem is None for elem in [accounts_file, tasks_file, project_file, output]]):
+        inferred_file_names = utils.infer_file_names(
+            scan_dir,
+            accounts=accounts_file, 
+            tasks=tasks_file,
+            project=project_file
+        )
+        accounts_file = inferred_file_names["accounts"]
+        tasks_file = inferred_file_names["tasks"]
+        project_file = inferred_file_names["project"]
     leiter_ids = logic.determine_leiter(tasks_file)
     accounts_info = parsing.parse_account_information(accounts_file, leiter_ids)
     sepa_info = parsing.parse_external_sepa_information(sepa_infos)
