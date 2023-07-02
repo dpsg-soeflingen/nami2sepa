@@ -6,12 +6,12 @@ Wichtige Informationen sind in Konfigurations-Dateien ausgelagert, die einfach a
 ## Installation
 Fuehre den folgenden Befehl aus, um das Tool zu installieren:
 ````shell
-sudo make install
+make install
 ````
 
 Die Deinstallation erfolgt mit dem folgenden Befehl:
 ````shell
-sudo make uninstall
+make uninstall
 ````
 
 ## Vereinsspezifische Konfiguration
