@@ -7,6 +7,7 @@ import datetime
 import json
 import pandas as pd
 import os
+import logging
 
 
 def generate_xml(orders):
@@ -17,7 +18,7 @@ def generate_xml(orders):
 
     for _, order in orders.iterrows():
         if pd.isna(order).sum():
-            print("FEHLERHAFTE DATEN:", order.Mandat, order.Verwendungszweck)
+            logging.error("FEHLERHAFTE DATEN:", order.Mandat, order.Verwendungszweck)
             continue
         payment = {
             "name": f"{order.Name}, {order.Vorname}",

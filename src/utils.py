@@ -16,10 +16,10 @@ def is_today(date: datetime.datetime):
 
 def infer_file_names(scan_dir, **file_types):
     for file_name in os.listdir(scan_dir):
-        print(file_name)
+        file_name = scan_dir + "/" + file_name
         if file_name.endswith("xlsx"):
             if file_types["accounts"] is None or file_types["tasks"] is None:
-                columns = pd.read_excel(scan_dir + "/" + file_name).columns
+                columns = pd.read_excel(file_name).columns
                 if "Taetigkeit_in_Gruppierung" in columns \
                     and file_types["tasks"] is None:
                     file_types["tasks"] = file_name
@@ -29,7 +29,6 @@ def infer_file_names(scan_dir, **file_types):
         elif file_name.endswith("json"):
             if file_types["project"] is None:
                 file_types["project"] = file_name
-    print(file_types)
     return file_types
 
 
