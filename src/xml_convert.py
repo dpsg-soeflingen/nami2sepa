@@ -20,12 +20,16 @@ def generate_xml(orders):
         if pd.isna(order).sum():
             logging.error("FEHLERHAFTE DATEN:", order.Mandat, order.Verwendungszweck)
             continue
+        is_first_payment = utils.is_today(order.Erstlastschrift)
+        if is_first_payment:
+            # TODO Update Sepa_Informations.xlsx.
+            logging.warning(f"Erstlastschrift {order.Verwendungszweck}")
         payment = {
             "name": f"{order.Name}, {order.Vorname}",
             "IBAN": order.IBAN,
             "BIC": order.BIC,
             "amount": int(round(float(order.Beitrag)*100)),
-            "type": "FRST" if utils.is_today(order.Erstlastschrift) else "RCUR",
+            "type": "FRST" if is_first_payment else "RCUR",
             "collection_date": datetime.date.today(),
             "mandate_id": str(order.Mandat),
             "mandate_date": order.Mandatsdatum,

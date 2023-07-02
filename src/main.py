@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 
 def run(accounts_file, tasks_file, project_file, output, scan_dir):
     sepa_infos = "~/.config/nami2sepa/Sepa_Informations.xlsx"
-    if any([elem is None for elem in [accounts_file, tasks_file, project_file, output]]):
+    if any([elem is None for elem in [accounts_file, tasks_file, project_file]]):
         inferred_file_names = utils.infer_file_names(
             scan_dir,
             accounts=accounts_file, 
@@ -28,6 +28,7 @@ def run(accounts_file, tasks_file, project_file, output, scan_dir):
     data = logic.calc_beitrag(data)
 
     # TODO Activate/Deactivate in config!
+    # TODO Incorrect! Can be overwritten by manual setting in e.g. Aktionen!
     # Should be called "ignore-members"
     # Remove members within Sozialtopf.
     # sepa = sepa[sepa["Beitrag"] > 0]
