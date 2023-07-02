@@ -1,14 +1,31 @@
-install:
-	mkdir .config/nami2sepa
-	cp -r src ~/.local/share/nami2sepa
-	python -m venv ~/.local/share/nami2sepa/.venv
-	~/.local/share/nami2sepa/.venv/bin/pip install -r requirements.txt
-	cp nami2sepa ~/.local/bin/
+INSTALL_PATH := /usr/local
+ifeq ($(origin XDG_CONFIG_HOME), undefined)
+	CONFIG_HOME := ~/.config
+else
+	CONFIG_HOME := $(XDG_CONFIG_HOME)
+endif
+
+
+install: $(CONFIG_HOME)/nami2sepa/sepa_config.json $(INSTALL_PATH)/lib/nami2sepa $(INSTALL_PATH)/bin/nami2sepa
+
+$(CONFIG_HOME)/nami2sepa/sepa_config.json: | $(CONFIG_HOME)/nami2sepa
+	cp sepa_config.json $@
+
+$(CONFIG_HOME)/nami2sepa:
+	mkdir -p $@
+
+$(INSTALL_PATH)/lib/nami2sepa:
+	mkdir $@
+	cp -r src/* $@
+	python -m venv $(INSTALL_PATH)/lib/nami2sepa/.venv
+	$(INSTALL_PATH)/lib/nami2sepa/.venv/bin/pip install -r requirements.txt
+
+$(INSTALL_PATH)/bin/nami2sepa:
+	cp nami2sepa $@
 
 uninstall:
-	rm -r ~/.local/share/nami2sepa
-	rm ~/.local/bin/nami2sepa
+	rm -r $(INSTALL_PATH)/lib/nami2sepa
+	rm $(INSTALL_PATH)/bin/nami2sepa
 
-install_dev:
-	python -m venv .venv
-	.venv/bin/pip install -r requirements.txt
+.PHONY: install uninstall
+
