@@ -1,6 +1,6 @@
 #!/bin/env python
 
-import utils
+from nami2sepa import utils
 
 from sepaxml import SepaDD
 import datetime

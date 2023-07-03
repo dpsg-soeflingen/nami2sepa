@@ -1,7 +1,8 @@
-#!/usr/local/lib/nami2sepa/.venv/bin/python
+#!/usr/bin/env python3
+
+from nami2sepa import main
 
 import os
-import sys
 from argparse import ArgumentParser
 import warnings
 warnings.filterwarnings("ignore")
@@ -21,15 +22,7 @@ def parse_arguments():
     return args
 
 
-if __name__ == "__main__":
+def run():
     args = parse_arguments()
-    root_dir = os.getcwd()
-
-    # Set path to source code.
-    # TODO Use environment variable.
-    os.chdir("/usr/local/lib/nami2sepa")
-    sys.path.append(os.getcwd())
-
-    import main
-    main.run(**(vars(args) | {"scan_dir": root_dir}))
+    main.run(**vars(args))
     

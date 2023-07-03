@@ -1,4 +1,4 @@
-import parsing
+from nami2sepa import parsing
 
 import pandas as pd
 import json

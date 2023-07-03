@@ -1,13 +1,20 @@
 #!/bin/env python
 
-import logic, parsing, utils, xml_convert
+from nami2sepa import (
+    logic,
+    parsing,
+    utils,
+    xml_convert
+)
 
 import logging
 import warnings
 warnings.filterwarnings('ignore')
+import os
 
 
-def run(accounts_file, tasks_file, project_file, output, scan_dir):
+def run(accounts_file, tasks_file, project_file, output):
+    scan_dir = os.getcwd()
     sepa_infos = "~/.config/nami2sepa/Sepa_Informations.xlsx"
     if any([elem is None for elem in [accounts_file, tasks_file, project_file]]):
         inferred_file_names = utils.infer_file_names(

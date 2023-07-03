@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nami2sepa"
+version = "0.1.0"
+authors = [
+    {name = "Dennis N. Schneider"}
+]
+description = "Ein Tool zur Generierung von SEPA-Sammellastschriften aus NaMi."
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "pandas",
+    "openpyxl",
+    "sepaxml @ git+https://github.com/raphaelm/python-sepaxml.git#egg=master"
+]
+
+[project.scripts]
+nami2sepa = "nami2sepa.run:run"

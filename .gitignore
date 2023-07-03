@@ -1,3 +1,5 @@
+build
+src/nami2sepa.egg-info
 .venv
 *.xlsx
 *.xml
