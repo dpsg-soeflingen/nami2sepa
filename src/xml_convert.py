@@ -18,7 +18,7 @@ def generate_xml(orders):
 
     for _, order in orders.iterrows():
         if pd.isna(order).sum():
-            logging.error("FEHLERHAFTE DATEN:", order.Mandat, order.Verwendungszweck)
+            logging.error(f"FEHLERHAFTE DATEN: {order.Mandat} {order.Verwendungszweck}")
             continue
         is_first_payment = utils.is_today(order.Erstlastschrift)
         if is_first_payment:
