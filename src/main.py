@@ -31,11 +31,11 @@ def run(accounts_file, tasks_file, project_file, output, scan_dir):
     # TODO Incorrect! Can be overwritten by manual setting in e.g. Aktionen!
     # Should be called "ignore-members"
     # Remove members within Sozialtopf.
-    ignored_members = data[data["Beitrag"] > 0]
+    ignored_members = data[data["Beitrag"] < 0]
     if len(ignored_members) > 0:
         for _, ignored_member in ignored_members.iterrows():
-            logging.warning(f"Ignoriere {data.Verwendungszweck}.")
-    data = data[data["Beitrag"] > 0]
+            logging.warning(f"Ignoriere {ignored_member.Verwendungszweck}.")
+    data = data.drop(ignored_members.index)
 
     # Sort columns.
     data = data \
