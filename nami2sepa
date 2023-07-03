@@ -26,13 +26,9 @@ if __name__ == "__main__":
     root_dir = os.getcwd()
 
     # Set path to source code.
-    os.chdir(os.path.expanduser("~/.local/lib/nami2sepa"))
+    # TODO Use environment variable.
+    os.chdir("/usr/local/lib/nami2sepa")
     sys.path.append(os.getcwd())
-
-    # Activate venv
-    #venv_activation = os.path.expanduser("~/.local/lib/nami2sepa/.venv/bin/activate_this.py")
-    #exec(compile(open(venv_activation, "rb").read(), venv_activation, "exec"), dict(__file__=venv_activation))
-
 
     import main
     main.run(**(vars(args) | {"scan_dir": root_dir}))
