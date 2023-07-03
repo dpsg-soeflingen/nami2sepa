@@ -4,22 +4,21 @@ NaMi2SEPA ermoeglicht einfaches Generieren von SEPA-Lastschriften aus NaMi-Expor
 Wichtige Informationen sind in Konfigurations-Dateien ausgelagert, die einfach angepasst werden koennen.
 
 ## Installation
-Fuehre den folgenden Befehl aus, um das Tool zu installieren:
+Fuehre den folgenden Befehl aus, um das Tool mit dem pip-package manager zu installieren:
 ````shell
-make install
+pip install 'git+https://github.com/dennisschneider-ml/dpsg-NaMi2SEPA.git'
 ````
 
 Die Deinstallation erfolgt mit dem folgenden Befehl:
 ````shell
-make uninstall
+pip uninstall nami2sepa
 ````
 
 ## Vereinsspezifische Konfiguration
-Bei Installation wird eine leere ``sepa_config.json``-Datei in ``~/.config/nami2sepa/`` erstellt.
-Fuelle diese mit den SEPA-Informationen deines Vereins aus. \
+Erstelle ein Konfigurations-Verzeichnis unter ``~/.config/nami2sepa/`` bzw. unter ``$XDG_CONFIG/nami2sepa/``.
+Lege die Dateien in ``config/`` darunter ab und fuelle ``sepa_config.json`` mit den SEPA-Informationen deines Vereins. \
 Des Weiteren ist in demselben Ordner eine ``Sepa_Informations.xlsx``.
-Da die Bank das Datum der Erstlastschrift, sowie der SEPA-Unterschrift benoetigt und diese Informationen nicht im NaMi hinterlegbar sind, muss diese Liste manuell gefuehrt werden.
-Konfiguriere die Berechnung von Beitraegen in der ``project_config.json``.
+Da die Bank das Datum der Erstlastschrift sowie der SEPA-Unterschrift benoetigt und diese Informationen nicht im NaMi hinterlegbar sind, muss diese Liste manuell gefuehrt werden.
 
 ## Nutzung
 Exportiere die Files ``Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung`` und ``Beitragsart und Kontoverbindung`` aus dem NaMi und lege sie in einem Ordner ab, z.B. in ``~/sommerlager``:
