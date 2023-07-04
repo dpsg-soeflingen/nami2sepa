@@ -11,6 +11,7 @@ import logging
 import os
 import warnings
 warnings.filterwarnings('ignore')
+logging.basicConfig(level=logging.INFO)
 
 
 def _make_absolute(path):
@@ -50,7 +51,7 @@ def run(accounts_file, tasks_file, project_file, output):
     ignored_members = data[data["Beitrag"] < 0]
     if len(ignored_members) > 0:
         for _, ignored_member in ignored_members.iterrows():
-            logging.warning(f"Ignoriere {ignored_member.Verwendungszweck}.")
+            logging.info(f"Ignoriere {ignored_member.Verwendungszweck}.")
     data = data.drop(ignored_members.index)
 
     # Sort columns.
@@ -66,9 +67,34 @@ def run(accounts_file, tasks_file, project_file, output):
     output_xml(sepa, output)
 
 
-def output_xml(df, file_path):
+def write_file(content, file_path):
     with open(file_path, "w") as out_file:
-        out_file.write(xml_convert.generate_xml(df))
+        out_file.write(content)
+
+
+def modify_filename(file_path, addition):
+    directory = os.path.dirname(file_path)
+    basename = os.path.basename(file_path)
+
+    name, extension = os.path.splitext(basename)
+    new_basename = name + addition + extension
+    new_file_path = os.path.join(directory, new_basename)
+
+    return new_file_path
+
+
+def output_xml(df, file_path):
+    rcur_output, frst_output = xml_convert.generate_xml(df)
+    if rcur_output and frst_output:
+        rcur_file_path = modify_filename(file_path, "_rcur")
+        frst_file_path = modify_filename(file_path, "_frst")
+        write_file(rcur_output, rcur_file_path)
+        write_file(frst_output, frst_file_path)
+        logging.info(f"Speichere in '{rcur_file_path}' und '{frst_file_path}' ...")
+    else:
+        write_file(rcur_output or frst_output, file_path)
+        logging.info(f"Speichere in '{file_path}' ...")
+
 
 def new(project_name):
     curr_dir = os.getcwd()

@@ -14,16 +14,16 @@ def generate_xml(orders):
     with open(os.path.expanduser("~/.config/nami2sepa/sepa_config.json"), "r") as file:
         config = json.load(file)
 
-    sepa = SepaDD(config, schema="pain.008.001.02", clean=True)
+    sepa_rcur = SepaDD(config, schema="pain.008.001.02", clean=True)
+    sepa_frst = SepaDD(config, schema="pain.008.001.02", clean=True)
+
+    has_rcur, has_frst = False, False
 
     for _, order in orders.iterrows():
         if pd.isna(order).sum():
             logging.error(f"FEHLERHAFTE DATEN: {order.Mandat} {order.Verwendungszweck}")
             continue
         is_first_payment = utils.is_today(order.Erstlastschrift)
-        if is_first_payment:
-            # TODO Update Sepa_Informations.xlsx.
-            logging.warning(f"Erstlastschrift {order.Verwendungszweck}")
         payment = {
             "name": f"{order.Name}, {order.Vorname}",
             "IBAN": order.IBAN,
@@ -36,6 +36,14 @@ def generate_xml(orders):
             "description": order.Verwendungszweck,
             "endtoend_id": order.Identifikation,
         }
-
-        sepa.add_payment(payment)
-    return sepa.export().decode("utf-8")
+        if is_first_payment:
+            has_frst = True
+            # TODO Update Sepa_Informations.xlsx.
+            logging.info(f"Erstlastschrift {order.Verwendungszweck}")
+            sepa_frst.add_payment(payment)
+        else:
+            has_rcur = True
+            sepa_rcur.add_payment(payment)
+    sepa_rcur_output = sepa_rcur.export().decode("utf-8") if has_rcur else None
+    sepa_frst_output = sepa_frst.export().decode("utf-8") if has_frst else None
+    return sepa_rcur_output, sepa_frst_output

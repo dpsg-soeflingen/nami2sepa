@@ -1,6 +1,7 @@
 import datetime
 import os
 import pandas as pd
+import logging
 
 
 def join(df1, df2):
@@ -29,6 +30,11 @@ def infer_file_names(scan_dir, **file_types):
         elif file_name.endswith("json"):
             if file_types["project"] is None:
                 file_types["project"] = file_name
+    non_inferrable_file_types = [key for key, value in file_types.items() if value is None]
+    if non_inferrable_file_types:
+        logging.error(f"Keine gueltigen Dateien im Quellverzeichnis gefunden fuer: " \
+            f"{non_inferrable_file_types}")
+        exit(1)
     return file_types
 
 
