@@ -8,13 +8,22 @@ from nami2sepa import (
 )
 
 import logging
+import os
 import warnings
 warnings.filterwarnings('ignore')
-import os
 
+
+def _make_absolute(path):
+    if path is not None:
+        return os.path.join(os.getcwd(), path)
+    return None
 
 def run(accounts_file, tasks_file, project_file, output):
     scan_dir = os.getcwd()
+    accounts_file = _make_absolute(accounts_file)
+    tasks_file = _make_absolute(tasks_file)
+    project_file = _make_absolute(project_file)
+    output = _make_absolute(output)
     sepa_infos = "~/.config/nami2sepa/Sepa_Informations.xlsx"
     if any([elem is None for elem in [accounts_file, tasks_file, project_file]]):
         inferred_file_names = utils.infer_file_names(
@@ -61,4 +70,6 @@ def output_xml(df, file_path):
     with open(file_path, "w") as out_file:
         out_file.write(xml_convert.generate_xml(df))
 
-
+def new(project_name):
+    curr_dir = os.getcwd()
+    os.mkdir(os.path.join(curr_dir, project_name))

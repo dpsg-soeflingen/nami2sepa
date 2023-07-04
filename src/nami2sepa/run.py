@@ -15,14 +15,27 @@ def parse_arguments():
     parser.add_argument("-t", "--tasks_file", help="Pfad zur Excel-Datei, in der NaMi-Suche: 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung'.")
     parser.add_argument("-p", "--project_file", help="Pfad zur Excel-Datei, die Mitgliedsnummer und Betrag fuer eine Aktion angibt.")
     parser.add_argument("-o", "--output", default="output.xml", help="Pfad zur Output-Datei, die der Bank fuer den Sammel-Einzug gegeben werden kann.")
+
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    parser_new = subparsers.add_parser("new", help="Erstellt eine neue Sammellastschrift.")
+    parser_new.add_argument("project_name", help="Name der Aktion/des Sammeleinzugs.")
     args = parser.parse_args()
-    for argument, value in vars(args).items():
-        if value is not None:
-            setattr(args, argument, os.path.abspath(value))
+    #for argument, value in vars(args).items():
+    #    if value is not None:
+    #        setattr(args, argument, os.path.abspath(value))
     return args
 
 
 def run():
     args = parse_arguments()
-    main.run(**vars(args))
+    if args.subcommand == "new":
+        main.new(args.project_name)
+    else:
+        main.run(
+            accounts_file=args.accounts_file, 
+            tasks_file=args.tasks_file,
+            project_file=args.project_file,
+            output=args.output
+        )
     
