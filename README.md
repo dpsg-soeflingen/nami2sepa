@@ -6,7 +6,7 @@ Wichtige Informationen sind in Konfigurations-Dateien ausgelagert, die einfach a
 ## Installation
 Fuehre den folgenden Befehl aus, um das Tool mit dem pip-package manager zu installieren:
 ````shell
-pip install 'git+https://github.com/dennisschneider-ml/dpsg-NaMi2SEPA.git'
+pip install 'git+https://github.com/dpsg-soeflingen/nami2sepa.git'
 ````
 
 Die Deinstallation erfolgt mit dem folgenden Befehl:
