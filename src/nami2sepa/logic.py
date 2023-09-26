@@ -29,6 +29,7 @@ def get_leader_state(user, nami):
 
 
 def calc_betrag(user, betrag, override_betrag, is_leader):
+    # TODO Make Beitragsarten configurable.
     if betrag is not None:
         return betrag
     elif not pd.isna(override_betrag):
