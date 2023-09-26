@@ -1,12 +1,13 @@
 #!/bin/env python
 
-from sepaxml import SepaDD
 import datetime
 import json
-import os
 import logging
+import os
 from dataclasses import astuple
+
 import pandas as pd
+from sepaxml import SepaDD
 
 
 def generate_xml(orders):
@@ -24,7 +25,7 @@ def generate_xml(orders):
             logging.error(f"FEHLERHAFTE DATEN: {order.mandat} {order.verwendungszweck}")
             continue
         payment = {
-            "name": f"{order.nachname}, {order.vorname}",
+            "name": f"{order.kontoinhaber_nachname}, {order.kontoinhaber_vorname}",
             "IBAN": order.iban,
             "BIC": order.bic,
             "amount": int(round(float(order.betrag)*100)),
