@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
+
 import pandas as pd
+
 
 @dataclass
 class SepaInformations:
@@ -44,7 +46,8 @@ def calc_betrag(user, betrag, override_betrag, is_leader):
         return 0
 
 
-def gather_information(vorname, nachname, betrag, project_data, nami, sepa_info):
+def gather_information(vorname, nachname, betrag, verwendungszweck, project_data, nami, sepa_info):
+    vorname, nachname = vorname.strip(), nachname.strip()
     search_result = nami.search(vorname=vorname, nachname=nachname)
     assert_unique_search_result(search_result, vorname, nachname)
     user = search_result[0].get_mitglied(nami)
@@ -56,9 +59,9 @@ def gather_information(vorname, nachname, betrag, project_data, nami, sepa_info)
     mandat = user.mitgliedsNummer
 
     # Project Data
-    verwendungszweck = project_data.Verwendungszweck[0].strip() + f" {vorname} {nachname}"
-    end2end_id = project_data.End2EndId[0].strip()
-    is_leader = (len(project_data) == 0) and get_leader_state(user, nami)
+    verwendungszweck = verwendungszweck.strip() + f" {vorname} {nachname}"
+    end2end_id = project_data.iloc[0].End2EndId.strip()
+    is_leader = pd.isnull(project_data.iloc[0].Vorname) and get_leader_state(user, nami)
 
     # Users Sepa Information
     user_sepa_info = sepa_info.loc[mandat]

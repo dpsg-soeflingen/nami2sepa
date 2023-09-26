@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import warnings
+from argparse import ArgumentParser
+
 from nami2sepa import main
 
-from argparse import ArgumentParser
-import warnings
 warnings.filterwarnings("ignore")
 
 def parse_arguments():

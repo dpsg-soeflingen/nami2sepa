@@ -1,23 +1,23 @@
 #!/bin/env python
 
-from concurrent.futures import ThreadPoolExecutor
-
 import getpass
-from nami2sepa import (
-    logic,
-    utils,
-    input_output as io,
-)
-
-from pynami.nami import NaMi
 import logging
 import os
 import warnings
+from concurrent.futures import ThreadPoolExecutor
+
+import pandas as pd
+from pynami.nami import NaMi
+
+from nami2sepa import input_output as io
+from nami2sepa import logic, utils
+
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
 
 def _run_project(project_data, sepa_info, nami):
+    logging.info("Aktionsdaten werden gesammelt ...")
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for _, participant in project_data.iterrows():
@@ -25,6 +25,7 @@ def _run_project(project_data, sepa_info, nami):
                 participant.Vorname, 
                 participant.Nachname, 
                 participant.Betrag,
+                participant.Verwendungszweck,
                 project_data,
                 nami,
                 sepa_info,
@@ -36,17 +37,23 @@ def _run_project(project_data, sepa_info, nami):
 
 
 def _run_membership_payment(project_data, sepa_info, nami):
+    logging.info("Beitragszahlungsinformationen werden gesammelt ...")
     active_members = nami.search(mglTypeId="MITGLIED", mglStatusId="AKTIV")
-    infos = [
-        logic.gather_information(
-            member.vorname,
-            member.nachname,
-            project_data=project_data,
-            nami=nami,
-            sepa_info=sepa_info,
-        )
-        for member in active_members
-    ]
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for member in active_members:
+            args=( 
+                member.vorname,
+                member.nachname,
+                None,
+                project_data.iloc[0].Verwendungszweck,
+                project_data,
+                nami,
+                sepa_info,
+            )
+            future = executor.submit(logic.gather_information, *args)
+            futures.append(future)
+        infos = [future.result() for future in futures]
     return infos
 
 
@@ -57,14 +64,14 @@ def run(project_path, output_path):
     else:
         project_data = io.open_project_file(project_path)
 
-    infos = None
-    username = input("Username: ")
-    password = getpass.getpass("Password: ")
+    username = input("Benutzername: ")
+    password = getpass.getpass("Passwort: ")
     with NaMi(username=username, password=password) as nami:
-        if len(project_data) > 0:
-            infos = _run_project(project_data, sepa_info, nami)
-        else:
+        if len(project_data) == 1 and pd.isnull(project_data.iloc[0].Vorname):
             infos = _run_membership_payment(project_data, sepa_info, nami)
+        else:
+            infos = _run_project(project_data, sepa_info, nami)
+    logging.info(f"{len(infos)} Eintraege gefunden.")
     io.output_xml(infos, output_path)
 
 
@@ -72,6 +79,3 @@ def new(project_name):
     curr_dir = os.getcwd()
     os.mkdir(os.path.join(curr_dir, project_name))
 
-
-if __name__ == "__main__":
-    run(None, "output.xml")
