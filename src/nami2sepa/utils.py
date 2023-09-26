@@ -1,41 +1,27 @@
-import datetime
 import os
-import pandas as pd
 import logging
 
-
-def join(df1, df2):
-    """
-    Combine sepa and sepa_dates
-    """
-    return df1.join(df2.set_index("Mandat"), on="Mandat")
+import pandas as pd
 
 
-def is_today(date: datetime.datetime):
-    return date.date() == datetime.date.today()
+def modify_filename(file_path, addition):
+    directory = os.path.dirname(file_path)
+    basename = os.path.basename(file_path)
+
+    name, extension = os.path.splitext(basename)
+    new_basename = name + addition + extension
+    new_file_path = os.path.join(directory, new_basename)
+
+    return new_file_path
 
 
-def infer_file_names(scan_dir, **file_types):
-    for file_name in os.listdir(scan_dir):
-        file_name = scan_dir + "/" + file_name
+def find_input_file(root_directory):
+    for file_name in os.listdir(root_directory):
+        file_name = root_directory + "/" + file_name
         if file_name.endswith("xlsx"):
-            if file_types["accounts"] is None or file_types["tasks"] is None:
-                columns = pd.read_excel(file_name).columns
-                if "Taetigkeit_in_Gruppierung" in columns \
-                    and file_types["tasks"] is None:
-                    file_types["tasks"] = file_name
-                elif "Kontonummer" in columns \
-                    and file_types["accounts"] is None:
-                    file_types["accounts"] = file_name
-        elif file_name.endswith("json"):
-            if file_types["project"] is None:
-                file_types["project"] = file_name
-    non_inferrable_file_types = [key for key, value in file_types.items() if value is None]
-    if non_inferrable_file_types:
-        logging.error(f"Keine gueltigen Dateien im Quellverzeichnis gefunden fuer: " \
-            f"{non_inferrable_file_types}")
-        exit(1)
-    return file_types
-
-
-
+            found_file = pd.read_excel(file_name)
+            columns = found_file.columns
+            if "Vorname" in columns:
+                return found_file
+    logging.error("Keine gueltigen Dateien im Quellverzeichnis gefunden.")
+    exit(1)

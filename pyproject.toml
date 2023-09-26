@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nami2sepa"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
     {name = "Dennis N. Schneider"}
 ]
@@ -14,7 +14,8 @@ requires-python = ">=3.7"
 dependencies = [
     "pandas",
     "openpyxl",
-    "sepaxml @ git+https://github.com/raphaelm/python-sepaxml.git#egg=master"
+    "sepaxml @ git+https://github.com/raphaelm/python-sepaxml.git#egg=master",
+    "pynami @ git+https://github.com/sscholz93/pynami.git#egg=master",
 ]
 
 [project.scripts]

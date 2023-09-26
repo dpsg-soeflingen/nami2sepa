@@ -1,3 +1,4 @@
 pandas
 openpyxl
 git+https://github.com/raphaelm/python-sepaxml.git
+git+https://github.com/sscholz93/pynami.git

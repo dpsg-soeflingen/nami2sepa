@@ -2,19 +2,15 @@
 
 from nami2sepa import main
 
-import os
 from argparse import ArgumentParser
 import warnings
 warnings.filterwarnings("ignore")
 
 def parse_arguments():
     parser = ArgumentParser(prog="SEPA Creator", description="Erstellt eine csv-Datei fuer SEPA-Sammeleinzuege aus Daten aus dem NaMi.\
-    Gib in die Nami-Suche 'Beitragsart und Kontoverbindung' ein und uebergib das File unter der Option '-p'. In der Nami-Suche unter 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung' wird ein File gedownloadet, das man unter der Option '-t' angeben muss. \
     Des Weiteren gibt es das File Sepa_Informations.xlsx, das Mandatsdatum, Ersteinzugsdatum, manuellen Beitrag etc. angibt.")
-    parser.add_argument("-a", "--accounts_file", help="Pfad zur Excel-Datei, in der NaMi-Suche: 'Beitragsart und Kontoverbindung.'")
-    parser.add_argument("-t", "--tasks_file", help="Pfad zur Excel-Datei, in der NaMi-Suche: 'Mitglieder: Grundinformationen mit Taetigkeiten und Stufe Abteilung'.")
-    parser.add_argument("-p", "--project_file", help="Pfad zur Excel-Datei, die Mitgliedsnummer und Betrag fuer eine Aktion angibt.")
-    parser.add_argument("-o", "--output", default="output.xml", help="Pfad zur Output-Datei, die der Bank fuer den Sammel-Einzug gegeben werden kann.")
+    parser.add_argument("-p", "--project_path", help="Pfad zur Excel-Datei, die Mitgliedsnummer und Betrag fuer eine Aktion angibt.")
+    parser.add_argument("-o", "--output_path", default="output.xml", help="Pfad zur Output-Datei, die der Bank fuer den Sammel-Einzug gegeben werden kann.")
 
     subparsers = parser.add_subparsers(dest="subcommand")
 
@@ -33,9 +29,7 @@ def run():
         main.new(args.project_name)
     else:
         main.run(
-            accounts_file=args.accounts_file, 
-            tasks_file=args.tasks_file,
-            project_file=args.project_file,
-            output=args.output
+            project_path=args.project_path,
+            output_path=args.output_path
         )
     

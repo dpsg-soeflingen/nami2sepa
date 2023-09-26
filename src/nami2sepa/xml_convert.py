@@ -1,13 +1,12 @@
 #!/bin/env python
 
-from nami2sepa import utils
-
 from sepaxml import SepaDD
 import datetime
 import json
-import pandas as pd
 import os
 import logging
+from dataclasses import astuple
+import pandas as pd
 
 
 def generate_xml(orders):
@@ -19,27 +18,27 @@ def generate_xml(orders):
 
     has_rcur, has_frst = False, False
 
-    for _, order in orders.iterrows():
-        if pd.isna(order).sum():
-            logging.error(f"FEHLERHAFTE DATEN: {order.Mandat} {order.Verwendungszweck}")
+    for order in orders:
+        if any([pd.isnull(o) for o in astuple(order)]):
+            print(order)
+            logging.error(f"FEHLERHAFTE DATEN: {order.mandat} {order.verwendungszweck}")
             continue
-        is_first_payment = utils.is_today(order.Erstlastschrift)
         payment = {
-            "name": f"{order.Name}, {order.Vorname}",
-            "IBAN": order.IBAN,
-            "BIC": order.BIC,
-            "amount": int(round(float(order.Beitrag)*100)),
-            "type": "FRST" if is_first_payment else "RCUR",
+            "name": f"{order.nachname}, {order.vorname}",
+            "IBAN": order.iban,
+            "BIC": order.bic,
+            "amount": int(round(float(order.betrag)*100)),
+            "type": "FRST" if order.is_first_payment else "RCUR",
             "collection_date": datetime.date.today(),
-            "mandate_id": str(order.Mandat),
-            "mandate_date": order.Mandatsdatum,
-            "description": order.Verwendungszweck,
-            "endtoend_id": order.Identifikation,
+            "mandate_id": str(order.mandat),
+            "mandate_date": order.sepa_datum.date(),
+            "description": order.verwendungszweck,
+            "endtoend_id": order.end2end_id,
         }
-        if is_first_payment:
+        if order.is_first_payment:
             has_frst = True
             # TODO Update Sepa_Informations.xlsx.
-            logging.info(f"Erstlastschrift {order.Verwendungszweck}")
+            logging.info(f"Erstlastschrift {order.verwendungszweck}")
             sepa_frst.add_payment(payment)
         else:
             has_rcur = True
@@ -47,3 +46,4 @@ def generate_xml(orders):
     sepa_rcur_output = sepa_rcur.export().decode("utf-8") if has_rcur else None
     sepa_frst_output = sepa_frst.export().decode("utf-8") if has_frst else None
     return sepa_rcur_output, sepa_frst_output
+

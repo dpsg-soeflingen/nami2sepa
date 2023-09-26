@@ -1,47 +1,93 @@
+from dataclasses import dataclass
+from datetime import datetime
 import pandas as pd
 
+@dataclass
+class SepaInformations:
+    vorname: str
+    nachname: str
+    kontoinhaber_vorname: str
+    kontoinhaber_nachname: str
+    bic: str
+    iban: str
+    mandat: str
+    verwendungszweck: str
+    is_first_payment: bool
+    sepa_datum: datetime
+    betrag: float
+    end2end_id: str
+    is_leader: bool = False
 
-def calc_beitrag(df):
-    # Standard beitrag calculation
-    df["Beitrag"] = df.apply(lambda row: calc_base_beitrag(row), axis=1)
-    # Manual Beitrag override
-    df["Beitrag"] = df["OverrideBeitrag"].fillna(df["Beitrag"])
-    # Aktions-Beitrag
-    df["Beitrag"] = df["AktionBeitrag"].fillna(df["Beitrag"])
-    return df
+
+def get_leader_state(user, nami):
+    activities = nami.mgl_activities(user.id)
+    current_activities = [act.taetigkeit for act in activities if not act.aktivBis]
+    print(current_activities)
+    return any([("LeiterIn" in act) for act in current_activities])
 
 
-def calc_base_beitrag(row):
-    """
-    Calculate fees of a certain member.
-    Leiter/Vorstaende: 15 Eur
-    Familienermaessigt: 20 Eur
-    Voller Beitrag: 27.50 Eur
-    """
-    beitrag = row["BeitragArt"]
-    if row["Leader/CEO"] == True:
+def calc_betrag(user, betrag, override_betrag, is_leader):
+    if betrag is not None:
+        return betrag
+    elif not pd.isna(override_betrag):
+        return override_betrag
+    elif is_leader:
         return 15
-    if "Sozialermäßigt" in beitrag:
+    elif "Sozialermäßigt" in user.beitragsart:
         return -1
-    if "Familienermäßigt" in beitrag:
-        return 20
-    if "Voller Beitrag" in beitrag:
-        return 27.50
-    if "Sozialtopf" in beitrag:
-        return 10
+    elif "Familienermäßigt" in user.beitragsart:
+        return 22.5
+    elif "Voller Beitrag" in user.beitragsart:
+        return 27.5
+    else:
+        print(f"Error in calc_betrag()! {user.vorname} {user.nachname}")
+        return 0
 
 
-# Determine Leiter.
-def determine_leiter(tasks_file_path):
-    """
-    Definition Leiter:
-    - Is an active member (did not resign).
-    - Has a current task (not yet finished) as a Leiter (Taetigkeit == "€ LeiterIn")
-    - OR: Is Stammesvorstand (Stufe_Abteilung == "Vorstand")
-    """
-    tasks = pd.read_excel(tasks_file_path)
-    leader_ids = tasks.loc[(tasks["Status"] == "AKTIV")\
-            & (tasks["Aktiv_Bis"] == "-null-")\
-            & ((tasks["Taetigkeit"] == "€ LeiterIn") | (tasks["Stufe_Abteilung"] == "Vorstand"))\
-        ].groupby("Mitgliedsnummer").head(1)["Mitgliedsnummer"]
-    return leader_ids
+def gather_information(vorname, nachname, betrag, project_data, nami, sepa_info):
+    search_result = nami.search(vorname=vorname, nachname=nachname)
+    assert_unique_search_result(search_result, vorname, nachname)
+    user = search_result[0].get_mitglied(nami)
+
+    # Nami Information
+    kontoinhaber_vorname, kontoinhaber_nachname = user.kontoverbindung.kontoinhaber.rsplit(" ", 1)
+    bic = user.kontoverbindung.bic
+    iban = user.kontoverbindung.iban
+    mandat = user.mitgliedsNummer
+
+    # Project Data
+    verwendungszweck = project_data.Verwendungszweck[0].strip() + f" {vorname} {nachname}"
+    end2end_id = project_data.End2EndId[0].strip()
+    is_leader = (len(project_data) == 0) and get_leader_state(user, nami)
+
+    # Users Sepa Information
+    user_sepa_info = sepa_info.loc[mandat]
+    is_first_payment = pd.isnull(user_sepa_info.Erstlastschrift)
+    sepa_datum = user_sepa_info.Datum
+    betrag = calc_betrag(user, betrag, user_sepa_info.OverrideBeitrag, is_leader)
+    return SepaInformations(
+        vorname=vorname,
+        nachname=nachname,
+        kontoinhaber_vorname=kontoinhaber_vorname,
+        kontoinhaber_nachname=kontoinhaber_nachname,
+        bic=bic,
+        iban=iban,
+        mandat=mandat,
+        verwendungszweck=verwendungszweck,
+        is_first_payment=is_first_payment,
+        sepa_datum=sepa_datum,
+        betrag=betrag,
+        end2end_id=end2end_id,
+        is_leader=is_leader,
+    )
+
+
+def assert_unique_search_result(search_result, vorname, nachname):
+    if len(search_result) == 0:
+        print(f"No result found matching {vorname} {nachname}. Exiting.")
+    elif len(search_result) > 1:
+        print(f"{len(search_result)} results found matching {vorname} {nachname}. Exiting.")
+    else:
+        return
+    exit()
+
