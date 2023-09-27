@@ -22,6 +22,11 @@ Erstelle das Verzeichnis, wenn es noch nicht vorhanden ist. \
 Fuelle die ``sepa_config.toml`` mit den SEPA-Informationen deines Vereins.
 Des Weiteren ist in demselben Ordner eine ``Sepa_Informations.xlsx``.
 Da die Bank das Datum der Erstlastschrift sowie der SEPA-Unterschrift benoetigt und diese Informationen nicht im NaMi hinterlegbar sind, muss diese Liste manuell gefuehrt werden.
+- Mitgliedsnummer: Die DPSG-Mitgliedsnummer wie sie im NaMi hinterlegt ist.
+- Vorname, Nachname: Der Name des Mitglieds.
+- Datum: Das Datum der Unterschrift des SEPA-Mandats.
+- Erstlastschrift: Das Datum der ersten SEPA-Lastschrift unter diesem Mandat.
+- OverrideBeitrag: Manuelles Ueberschreiben des Betrags wenn der halb-jaehrliche Mitgliedsbeitrag eingezogen wird. Dies kann fuer Alumnis verwendet werden, die nicht mehr aktiv als Leiter im NaMi eingetragen sind aber dennoch einen geringeren Beitrag zahlen sollen.
 
 ## Nutzung
 Als Grundlage zur Nutzung wird eine Excel-Datei verwendet, die jedem Benutzer einen einzuziehenden Betrag zuweist.
