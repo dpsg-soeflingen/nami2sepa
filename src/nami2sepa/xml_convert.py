@@ -28,7 +28,7 @@ def generate_xml(orders):
             "name": f"{order.kontoinhaber_nachname}, {order.kontoinhaber_vorname}",
             "IBAN": order.iban,
             "BIC": order.bic,
-            "amount": int(round(float(order.betrag)*100)),
+            "amount": int(round(float(order.betrag) * 100)),
             "type": "FRST" if order.is_first_payment else "RCUR",
             "collection_date": datetime.date.today(),
             "mandate_id": str(order.mandat),
@@ -47,4 +47,3 @@ def generate_xml(orders):
     sepa_rcur_output = sepa_rcur.export().decode("utf-8") if has_rcur else None
     sepa_frst_output = sepa_frst.export().decode("utf-8") if has_frst else None
     return sepa_rcur_output, sepa_frst_output
-

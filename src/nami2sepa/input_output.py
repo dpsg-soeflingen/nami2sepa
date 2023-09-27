@@ -11,7 +11,9 @@ def open_project_file(project_path):
 
 
 def open_sepa_info():
-    data = pd.read_excel("~/.config/nami2sepa/Sepa_Informations.xlsx", index_col="Mitgliedsnummer")
+    data = pd.read_excel(
+        "~/.config/nami2sepa/Sepa_Informations.xlsx", index_col="Mitgliedsnummer"
+    )
     return data
 
 
@@ -31,4 +33,3 @@ def output_xml(data, path):
     else:
         write_file(rcur_output or frst_output, path)
         logging.info(f"Gespeichert in '{path}'.")
-

@@ -12,7 +12,7 @@ from pynami.nami import NaMi
 from nami2sepa import input_output as io
 from nami2sepa import logic, utils
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO)
 
 
@@ -21,9 +21,9 @@ def _run_project(project_data, sepa_info, nami):
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for _, participant in project_data.iterrows():
-            args=( 
-                participant.Vorname, 
-                participant.Nachname, 
+            args = (
+                participant.Vorname,
+                participant.Nachname,
                 participant.Betrag,
                 participant.Verwendungszweck,
                 project_data,
@@ -42,7 +42,7 @@ def _run_membership_payment(project_data, sepa_info, nami):
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for member in active_members:
-            args=( 
+            args = (
                 member.vorname,
                 member.nachname,
                 None,
@@ -78,4 +78,3 @@ def run(project_path, output_path):
 def new(project_name):
     curr_dir = os.getcwd()
     os.mkdir(os.path.join(curr_dir, project_name))
-

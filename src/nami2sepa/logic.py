@@ -47,14 +47,19 @@ def calc_betrag(user, betrag, override_betrag, is_leader):
         return 0
 
 
-def gather_information(vorname, nachname, betrag, verwendungszweck, project_data, nami, sepa_info):
+def gather_information(
+    vorname, nachname, betrag, verwendungszweck, project_data, nami, sepa_info
+):
     vorname, nachname = vorname.strip(), nachname.strip()
     search_result = nami.search(vorname=vorname, nachname=nachname)
     assert_unique_search_result(search_result, vorname, nachname)
     user = search_result[0].get_mitglied(nami)
 
     # Nami Information
-    kontoinhaber_vorname, kontoinhaber_nachname = user.kontoverbindung.kontoinhaber.rsplit(" ", 1)
+    (
+        kontoinhaber_vorname,
+        kontoinhaber_nachname,
+    ) = user.kontoverbindung.kontoinhaber.rsplit(" ", 1)
     bic = user.kontoverbindung.bic
     iban = user.kontoverbindung.iban
     mandat = user.mitgliedsNummer
@@ -90,8 +95,9 @@ def assert_unique_search_result(search_result, vorname, nachname):
     if len(search_result) == 0:
         print(f"No result found matching {vorname} {nachname}. Exiting.")
     elif len(search_result) > 1:
-        print(f"{len(search_result)} results found matching {vorname} {nachname}. Exiting.")
+        print(
+            f"{len(search_result)} results found matching {vorname} {nachname}. Exiting."
+        )
     else:
         return
     exit()
-
