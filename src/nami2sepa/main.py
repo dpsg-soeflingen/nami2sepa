@@ -1,23 +1,22 @@
 #!/bin/env python
 
 import getpass
-import logging
 import os
 import warnings
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
+from loguru import logger
 from pynami.nami import NaMi
 
 from nami2sepa import input_output as io
 from nami2sepa import logic, utils
 
 warnings.filterwarnings("ignore")
-logging.basicConfig(level=logging.INFO)
 
 
 def _run_project(project_data, sepa_info, nami):
-    logging.info("Aktionsdaten werden gesammelt ...")
+    logger.info("Aktionsdaten werden gesammelt ...")
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for _, participant in project_data.iterrows():
@@ -37,7 +36,7 @@ def _run_project(project_data, sepa_info, nami):
 
 
 def _run_membership_payment(project_data, sepa_info, nami):
-    logging.info("Beitragszahlungsinformationen werden gesammelt ...")
+    logger.info("Beitragszahlungsinformationen werden gesammelt ...")
     active_members = nami.search(mglTypeId="MITGLIED", mglStatusId="AKTIV")
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
@@ -71,7 +70,7 @@ def run(project_path, output_path):
             infos = _run_membership_payment(project_data, sepa_info, nami)
         else:
             infos = _run_project(project_data, sepa_info, nami)
-    logging.info(f"{len(infos)} Eintraege gefunden.")
+    logger.info(f"{len(infos)} Eintraege gefunden.")
     io.output_xml(infos, output_path)
 
 

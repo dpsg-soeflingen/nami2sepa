@@ -1,0 +1,12 @@
+[sepa]
+name = "Euer DPSG Stammes-Name"
+IBAN = "Eure IBAN DE..."
+BIC = "..."
+creditor_id = "Eure Glaeubiger-Identifikationsnummer DE..."
+currency = "EUR"
+
+[membership_fees]
+leader = 15
+social = -1 # Negative Werte werden ignoriert und somit nicht eingezogen.
+family = 22.5
+full = 27.5

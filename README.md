@@ -1,6 +1,6 @@
 # NaMi2SEPA
 
-NaMi2SEPA ermoeglicht einfaches Generieren von SEPA-Lastschriften aus NaMi-Exports.
+NaMi2SEPA ermoeglicht einfaches Generieren von SEPA-Lastschriften direkt aus der DPSG Mitgliederverwaltung NaMi.
 Wichtige Informationen sind in Konfigurations-Dateien ausgelagert, die einfach angepasst werden koennen.
 
 ## Installation
@@ -24,7 +24,7 @@ Da die Bank das Datum der Erstlastschrift sowie der SEPA-Unterschrift benoetigt 
 ## Nutzung
 Als Grundlage zur Nutzung wird eine Excel-Datei verwendet, die jedem Benutzer einen einzuziehenden Betrag zuweist.
 Ein Beispiel zu einer solchen Datei ist unter ``lib/InputTemplate.xlsx`` zu finden.
-Starte das Tool in einem Verzeichnis mit genau einer Input-Datei.
+Starte das Tool in einem Verzeichnis mit genau einer solchen Input-Datei.
 Dieses wird automatisch erkannt.
 ````shell
 nami2sepa
@@ -51,7 +51,7 @@ Da in NaMi die Taetigkeiten der einzelnen Mitglieder protokolliert sind, werden 
 - Leiter
 - Alumni/Aktive Mitglieder (Manuell in ``~/.config/nami2sepa/Sepa_Informations.xlsx`` gefuehrt.)
 
-## Automatische Erstellung von Projekt-Einzuegen
+## Automatisches Erstellen von Projekt-Einzuegen
 
 [WIP] \
 Der folgende Befehl soll einen Ordner mit zugehoerigen files erstellen:

@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 
+import sys
 import warnings
 from argparse import ArgumentParser
+
+from loguru import logger
 
 from nami2sepa import main
 
 warnings.filterwarnings("ignore")
+logger.remove()
+logger.add(
+    sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>"
+)
 
 
 def parse_arguments():

@@ -16,6 +16,7 @@ dependencies = [
     "openpyxl",
     "sepaxml @ git+https://github.com/raphaelm/python-sepaxml.git#egg=master",
     "pynami @ git+https://github.com/sscholz93/pynami.git#egg=master",
+    "loguru",
 ]
 
 [project.scripts]

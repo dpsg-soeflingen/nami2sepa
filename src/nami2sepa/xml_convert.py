@@ -1,28 +1,30 @@
 #!/bin/env python
 
 import datetime
-import json
-import logging
 import os
+import tomllib
 from dataclasses import astuple
 
 import pandas as pd
+from loguru import logger
 from sepaxml import SepaDD
 
 
 def generate_xml(orders):
-    with open(os.path.expanduser("~/.config/nami2sepa/sepa_config.json"), "r") as file:
-        config = json.load(file)
+    with open(os.path.expanduser("~/.config/nami2sepa/sepa_config.toml"), "rb") as file:
+        config = tomllib.load(file)["sepa"]
 
-    sepa_rcur = SepaDD(config, schema="pain.008.001.02", clean=True)
-    sepa_frst = SepaDD(config, schema="pain.008.001.02", clean=True)
+    sepa_config = config | {"batch": True}
+    sepa_rcur = SepaDD(sepa_config, schema="pain.008.001.02", clean=True)
+    sepa_frst = SepaDD(sepa_config, schema="pain.008.001.02", clean=True)
 
     has_rcur, has_frst = False, False
 
     for order in orders:
         if any([pd.isnull(o) for o in astuple(order)]):
-            print(order)
-            logging.error(f"FEHLERHAFTE DATEN: {order.mandat} {order.verwendungszweck}")
+            logger.error(
+                f"FEHLERHAFTE DATEN: {order.mandat} {order.verwendungszweck}. Wird uebersprungen."
+            )
             continue
         payment = {
             "name": f"{order.kontoinhaber_nachname}, {order.kontoinhaber_vorname}",
@@ -39,7 +41,7 @@ def generate_xml(orders):
         if order.is_first_payment:
             has_frst = True
             # TODO Update Sepa_Informations.xlsx.
-            logging.info(f"Erstlastschrift {order.verwendungszweck}")
+            logger.info(f"Erstlastschrift {order.verwendungszweck}")
             sepa_frst.add_payment(payment)
         else:
             has_rcur = True

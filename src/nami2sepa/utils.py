@@ -1,7 +1,7 @@
-import logging
 import os
 
 import pandas as pd
+from loguru import logger
 
 
 def modify_filename(file_path, addition):
@@ -22,7 +22,7 @@ def find_input_file(root_directory):
             found_file = pd.read_excel(file_name)
             columns = found_file.columns
             if "Vorname" in columns:
-                logging.info(f"Verwende Input-Datei {file_name}.")
+                logger.info(f"Verwende Input-Datei {file_name}.")
                 return found_file
-    logging.error("Keine gueltigen Dateien im Quellverzeichnis gefunden.")
+    logger.error("Keine gueltigen Dateien im Quellverzeichnis gefunden.")
     exit(1)

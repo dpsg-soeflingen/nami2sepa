@@ -1,7 +1,18 @@
+import os
+import tomllib
 from dataclasses import dataclass
 from datetime import datetime
+from functools import lru_cache
 
 import pandas as pd
+from loguru import logger
+
+
+@lru_cache(maxsize=1)
+def amounts():
+    with open(os.path.expanduser("~/.config/nami2sepa/sepa_config.toml"), "rb") as file:
+        config = tomllib.load(file)["membership_fees"]
+    return config
 
 
 @dataclass
@@ -24,26 +35,25 @@ class SepaInformations:
 def get_leader_state(user, nami):
     activities = nami.mgl_activities(user.id)
     current_activities = [act.taetigkeit for act in activities if not act.aktivBis]
-    print(current_activities)
-    return any([("LeiterIn" in act) for act in current_activities])
+    return "LeiterIn" in "|".join(current_activities)
 
 
 def calc_betrag(user, betrag, override_betrag, is_leader):
-    # TODO Make Beitragsarten configurable.
     if betrag is not None:
         return betrag
     elif not pd.isna(override_betrag):
         return override_betrag
     elif is_leader:
-        return 15
+        return amounts()["leader"]
     elif "Sozialermäßigt" in user.beitragsart:
-        return -1
+        return amounts()["social"]
     elif "Familienermäßigt" in user.beitragsart:
-        return 22.5
+        return amounts()["family"]
     elif "Voller Beitrag" in user.beitragsart:
-        return 27.5
+        return amounts()["full"]
     else:
-        print(f"Error in calc_betrag()! {user.vorname} {user.nachname}")
+        logger.error(f"Error in calc_betrag()! {user.vorname} {user.nachname}")
+        exit(1)
         return 0
 
 
@@ -93,9 +103,9 @@ def gather_information(
 
 def assert_unique_search_result(search_result, vorname, nachname):
     if len(search_result) == 0:
-        print(f"No result found matching {vorname} {nachname}. Exiting.")
+        logger.error(f"No result found matching {vorname} {nachname}. Exiting.")
     elif len(search_result) > 1:
-        print(
+        logger.error(
             f"{len(search_result)} results found matching {vorname} {nachname}. Exiting."
         )
     else:
