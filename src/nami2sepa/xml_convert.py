@@ -15,6 +15,7 @@ def generate_xml(orders):
         config = tomllib.load(file)["sepa"]
 
     sepa_config = config | {"batch": True}
+    # pain.008 is the correct format for direct debit.
     sepa_rcur = SepaDD(sepa_config, schema="pain.008.001.02", clean=True)
     sepa_frst = SepaDD(sepa_config, schema="pain.008.001.02", clean=True)
 

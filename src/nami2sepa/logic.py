@@ -54,7 +54,6 @@ def calc_betrag(user, betrag, override_betrag, is_leader):
     else:
         logger.error(f"Error in calc_betrag()! {user.vorname} {user.nachname}")
         exit(1)
-        return 0
 
 
 def gather_information(
@@ -75,7 +74,7 @@ def gather_information(
     mandat = user.mitgliedsNummer
 
     # Project Data
-    verwendungszweck = verwendungszweck.strip() + f" {vorname} {nachname}"
+    verwendungszweck = verwendungszweck.strip() + f" {nachname}, {vorname}"
     end2end_id = project_data.iloc[0].End2EndId.strip()
     is_leader = pd.isnull(project_data.iloc[0].Vorname) and get_leader_state(user, nami)
 
@@ -103,7 +102,7 @@ def gather_information(
 
 def assert_unique_search_result(search_result, vorname, nachname):
     if len(search_result) == 0:
-        logger.error(f"No result found matching {vorname} {nachname}. Exiting.")
+        logger.error(f"No result found matching {nachname}, {vorname}. Exiting.")
     elif len(search_result) > 1:
         logger.error(
             f"{len(search_result)} results found matching {vorname} {nachname}. Exiting."
