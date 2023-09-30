@@ -76,6 +76,8 @@ def gather_information(
     # Project Data
     verwendungszweck = verwendungszweck.strip() + f" {nachname}, {vorname}"
     end2end_id = project_data.iloc[0].End2EndId.strip()
+    # The End2EndId does not allow underscores.
+    assert "_" not in end2end_id
     is_leader = pd.isnull(project_data.iloc[0].Vorname) and get_leader_state(user, nami)
 
     # Users Sepa Information
