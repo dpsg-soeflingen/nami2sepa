@@ -3,6 +3,7 @@
 import getpass
 import os
 import warnings
+import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
@@ -17,7 +18,7 @@ warnings.filterwarnings("ignore")
 
 def _run_project(project_data, sepa_info, nami):
     logger.info("Aktionsdaten werden gesammelt ...")
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = []
         for _, participant in project_data.iterrows():
             args = (
@@ -38,7 +39,7 @@ def _run_project(project_data, sepa_info, nami):
 def _run_membership_payment(project_data, sepa_info, nami):
     logger.info("Beitragszahlungsinformationen werden gesammelt ...")
     active_members = nami.search(mglTypeId="MITGLIED", mglStatusId="AKTIV")
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = []
         for member in active_members:
             args = (
